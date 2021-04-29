@@ -2,14 +2,14 @@ package com.xxl.job.executor.service.jobhandler;
 
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
+import com.xxl.job.executor.util.FileUtil;
+import com.xxl.job.executor.util.KnimeUtil;
+import com.xxl.job.executor.util.MinioClientUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
@@ -51,9 +51,32 @@ public class SampleXxlJob {
      */
     @XxlJob("testJobHandler")
     public void testJobHandler() throws Exception {
+        String param = XxlJobHelper.getJobParam();
+        logger.info("接收調度中心参数...[{}]",param);
         for (int i = 0; i < 5; i++) {
             System.out.println("测试："+i);
         }
+
+
+    }
+
+    @XxlJob("excuteknime")
+    public void excuteknime() throws Exception {
+        String param = XxlJobHelper.getJobParam();
+        String objectName=param.substring(param.lastIndexOf("/")+1);
+        System.out.println(objectName);
+        String objectRoot=param.substring(0,param.lastIndexOf("/")+1);
+        System.out.println(objectRoot);
+        InputStream inputStream = MinioClientUtils.getFile("article", objectRoot, objectName);
+        if (inputStream==null){
+            System.out.println("knime不存在");
+        }
+        String path="G:\\nick\\aa.knwf";//存储地址
+        FileUtil.inputStreamToFile(inputStream,path);
+        KnimeUtil a = new KnimeUtil();
+        String knimePath = "cmd /c D:\\knime_4.3.1.win32.win32.x86_64\\knime_4.3.1\\plugins\\org.eclipse.equinox.launcher_1.5.700.v20200207-2156.jar";
+        a.executeKnime(path, knimePath);
+        System.out.println("成功");
     }
 
 
