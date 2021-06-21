@@ -1,5 +1,7 @@
 package com.xxl.job.admin.core.complete;
 
+import com.google.common.base.Joiner;
+import com.sun.deploy.util.StringUtils;
 import com.xxl.job.admin.core.conf.XxlJobAdminConfig;
 import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.admin.core.model.XxlJobLog;
@@ -12,12 +14,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * @author xuxueli 2020-10-30 20:43:10
  */
 public class XxlJobCompleter {
     private static Logger logger = LoggerFactory.getLogger(XxlJobCompleter.class);
+
+    public static List<Integer> jobIds=new ArrayList();
+    public static boolean isFirst= false;
 
     /**
      * common fresh handle entrance (limit only once)
@@ -76,6 +84,36 @@ public class XxlJobCompleter {
                 }
 
             }
+
+
+            //自定义链接式执行xxljob  a-->b-->c  start
+            System.out.println("logId:"+xxlJobLog.getId());
+            String childrens=xxlJobLog.getChildJobid();
+            if (childrens != null) {
+                System.out.println(childrens);
+                triggerChildMsg = "<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_child_run") + "<<<<<<<<<<< </span><br>";
+
+                Integer childJobId = Integer.valueOf(childrens.split(",")[0]);
+
+                if(getChildrens(childrens)==null){
+                    JobTriggerPoolHelper.trigger(childJobId, TriggerTypeEnum.PARENT, -1, null,
+                            null, null);
+                }else{
+                    JobTriggerPoolHelper.triggerTwo(childJobId, TriggerTypeEnum.PARENT, -1, null,
+                            null, null, getChildrens(childrens));
+                }
+
+                ReturnT<String> triggerChildResult = ReturnT.SUCCESS;
+
+                // add msg
+                triggerChildMsg += MessageFormat.format(I18nUtil.getString("jobconf_callback_child_msg1"),
+                        (1),
+                        childrens.split(",").length,
+                        childJobId,
+                        (triggerChildResult.getCode() == ReturnT.SUCCESS_CODE ? I18nUtil.getString("system_success") : I18nUtil.getString("system_fail")),
+                        triggerChildResult.getMsg());
+            }
+            //end
         }
 
         if (triggerChildMsg != null) {
@@ -85,6 +123,21 @@ public class XxlJobCompleter {
         // 2、fix_delay trigger next
         // on the way
 
+    }
+
+    private static String getChildrens(String childrens){
+        String[] strings=childrens.split(",");
+        String value="";
+        for(int i=0;i<strings.length;i++){
+            if (i!=0){
+                value=value+strings[i]+",";
+            }
+        }
+        if (!value.equals("")){
+            value=value.substring(0,value.length()-1);
+        }
+
+        return value;
     }
 
     private static boolean isNumeric(String str){

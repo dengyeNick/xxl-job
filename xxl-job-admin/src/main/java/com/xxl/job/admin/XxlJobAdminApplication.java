@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class XxlJobAdminApplication {
 
 	public static void main(String[] args) {
+		System.out.println("dsf");
         SpringApplication.run(XxlJobAdminApplication.class, args);
 	}
 

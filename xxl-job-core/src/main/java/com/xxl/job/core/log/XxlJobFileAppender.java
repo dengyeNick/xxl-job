@@ -143,6 +143,7 @@ public class XxlJobFileAppender {
 		}
 		File logFile = new File(logFileName);
 
+		System.out.println(logFile.getAbsolutePath());
 		if (!logFile.exists()) {
             return new LogResult(fromLineNum, 0, "readLog fail, logFile not exists", true);
 		}

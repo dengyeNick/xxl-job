@@ -36,14 +36,12 @@ public class SampleXxlJob {
      */
     @XxlJob("demoJobHandler")
     public void demoJobHandler() throws Exception {
-        XxlJobHelper.log("XXL-JOB, Hello World.");
-
         for (int i = 0; i < 5; i++) {
             XxlJobHelper.log("beat at:" + i);
             TimeUnit.SECONDS.sleep(2);
             System.out.println("第："+i);
         }
-        // default success
+        XxlJobHelper.log("XXL-JOB, Hello World.");
     }
 
     /**
@@ -53,10 +51,11 @@ public class SampleXxlJob {
     public void testJobHandler() throws Exception {
         String param = XxlJobHelper.getJobParam();
         logger.info("接收調度中心参数...[{}]",param);
+        XxlJobHelper.log("XXL-JOB, Hello World.");
         for (int i = 0; i < 5; i++) {
             System.out.println("测试："+i);
         }
-
+//        throw new Exception("HAHA");
 
     }
 
@@ -74,7 +73,7 @@ public class SampleXxlJob {
         String path="G:\\nick\\aa.knwf";//存储地址
         FileUtil.inputStreamToFile(inputStream,path);
         KnimeUtil a = new KnimeUtil();
-        String knimePath = "cmd /c D:\\knime_4.3.1.win32.win32.x86_64\\knime_4.3.1\\plugins\\org.eclipse.equinox.launcher_1.5.700.v20200207-2156.jar";
+        String knimePath = " D:\\knime_4.3.1.win32.win32.x86_64\\knime_4.3.1\\plugins\\org.eclipse.equinox.launcher_1.5.700.v20200207-2156.jar";
         a.executeKnime(path, knimePath);
         System.out.println("成功");
     }
@@ -275,7 +274,29 @@ public class SampleXxlJob {
     @XxlJob(value = "demoJobHandler2", init = "init", destroy = "destroy")
     public void demoJobHandler2() throws Exception {
         XxlJobHelper.log("XXL-JOB, Hello World.");
+        System.out.println("测试类2");
+        for (int i = 0; i < 5; i++) {
+            XxlJobHelper.log("beat at:" + i);
+            TimeUnit.SECONDS.sleep(2);
+            System.out.println("第："+i);
+        }
     }
+
+    /**
+     * 5、生命周期任务示例：任务初始化与销毁时，支持自定义相关逻辑；
+     */
+    @XxlJob(value = "demoJobHandler3", init = "init", destroy = "destroy")
+    public void demoJobHandler3() throws Exception {
+        XxlJobHelper.log("XXL-JOB, Hello World.");
+        System.out.println("测试类3");
+        for (int i = 0; i < 5; i++) {
+            XxlJobHelper.log("beat at:" + i);
+            TimeUnit.SECONDS.sleep(2);
+            System.out.println("第："+i);
+        }
+    }
+
+
     public void init(){
         logger.info("init");
     }

@@ -25,11 +25,28 @@ public class KnimeUtil {
 		String workFlowFile = " -workflowFile=\"" + path + "\"";
 		String command = knimePath + " -application org.knime.product.KNIME_BATCH_APPLICATION -reset"
 				+ workFlowFile;
+
+		//判断运行环境
+		String[] window = {"cmd","/c",command};
+		String[] linux={"/bin/sh","-c", command};
+		String[] cmdString= {};
+		try {
+			String os = System.getProperty("os.name");
+			if (os.toLowerCase().startsWith("win")) {
+				System.out.println(os + " can't gunzip");
+				cmdString = window;
+			} else {
+				cmdString = linux;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		try {
 			
 			log.info("-----cmd执行中-----");
 			log.info("cmd路径：" + command);
-			Process process = Runtime.getRuntime().exec(command);
+			Process process = Runtime.getRuntime().exec(cmdString);
 			
 			// 输入流
 			InputStream inputStream = process.getInputStream();
