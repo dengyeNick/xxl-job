@@ -89,7 +89,7 @@ public class XxlJobCompleter {
             //自定义链接式执行xxljob  a-->b-->c  start
             System.out.println("logId:"+xxlJobLog.getId());
             String childrens=xxlJobLog.getChildJobid();
-            if (childrens != null) {
+            if (childrens != null && !childrens.equals("")) {
                 System.out.println(childrens);
                 triggerChildMsg = "<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_child_run") + "<<<<<<<<<<< </span><br>";
 
