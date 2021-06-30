@@ -1,6 +1,9 @@
 package com.xxl.job.admin.core.complete;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Joiner;
+import com.google.gson.JsonObject;
 import com.sun.deploy.util.StringUtils;
 import com.xxl.job.admin.core.conf.XxlJobAdminConfig;
 import com.xxl.job.admin.core.model.XxlJobInfo;
@@ -14,9 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * @author xuxueli 2020-10-30 20:43:10
@@ -89,6 +90,7 @@ public class XxlJobCompleter {
             //自定义链接式执行xxljob  a-->b-->c  start
             System.out.println("logId:"+xxlJobLog.getId());
             String childrens=xxlJobLog.getChildJobid();
+            String childJson=xxlJobLog.getChildJson();
             if (childrens != null && !childrens.equals("")) {
                 System.out.println(childrens);
                 triggerChildMsg = "<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_child_run") + "<<<<<<<<<<< </span><br>";
@@ -99,8 +101,9 @@ public class XxlJobCompleter {
                     JobTriggerPoolHelper.trigger(childJobId, TriggerTypeEnum.PARENT, -1, null,
                             null, null);
                 }else{
+                    List<Map> child_json= toListMap(childJson);
                     JobTriggerPoolHelper.triggerTwo(childJobId, TriggerTypeEnum.PARENT, -1, null,
-                            null, null, getChildrens(childrens));
+                            child_json.get(0).toString(), null, getChildrens(childrens),rmFirst(child_json));
                 }
 
                 ReturnT<String> triggerChildResult = ReturnT.SUCCESS;
@@ -147,6 +150,16 @@ public class XxlJobCompleter {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public static List<Map> toListMap(String json){
+        List<Map> vendors = (List<Map>) JSON.parse(json);
+        return vendors;
+    }
+
+    public static List<Map> rmFirst( List<Map> vendors){
+        vendors.remove(0);
+        return vendors;
     }
 
 }

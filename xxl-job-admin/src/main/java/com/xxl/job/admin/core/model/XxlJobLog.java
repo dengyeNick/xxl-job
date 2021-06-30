@@ -14,6 +14,7 @@ public class XxlJobLog {
 	private int jobGroup;
 	private int jobId;
 	private String childJobid;
+	private String childJson;
 
 	// execute info
 	private String executorAddress;
@@ -34,6 +35,14 @@ public class XxlJobLog {
 
 	// alarm info
 	private int alarmStatus;
+
+	public String getChildJson() {
+		return childJson;
+	}
+
+	public void setChildJson(String childJson) {
+		this.childJson = childJson;
+	}
 
 	public String getChildJobid() {
 		return childJobid;

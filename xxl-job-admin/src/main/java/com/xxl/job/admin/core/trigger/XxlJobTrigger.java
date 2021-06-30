@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * xxl-job trigger
@@ -46,7 +48,7 @@ public class XxlJobTrigger {
                                int failRetryCount,
                                String executorShardingParam,
                                String executorParam,
-                               String addressList,String childJobid) {
+                               String addressList, String childJobid, List<Map> child_json) {
 
         // load data
         XxlJobInfo jobInfo = XxlJobAdminConfig.getAdminConfig().getXxlJobInfoDao().loadById(jobId);
@@ -80,13 +82,13 @@ public class XxlJobTrigger {
                 && group.getRegistryList()!=null && !group.getRegistryList().isEmpty()
                 && shardingParam==null) {
             for (int i = 0; i < group.getRegistryList().size(); i++) {
-                processTrigger(group, jobInfo, finalFailRetryCount, triggerType, i, group.getRegistryList().size(),childJobid);
+                processTrigger(group, jobInfo, finalFailRetryCount, triggerType, i, group.getRegistryList().size(),childJobid,child_json);
             }
         } else {
             if (shardingParam == null) {
                 shardingParam = new int[]{0, 1};
             }
-            processTrigger(group, jobInfo, finalFailRetryCount, triggerType, shardingParam[0], shardingParam[1],childJobid);
+            processTrigger(group, jobInfo, finalFailRetryCount, triggerType, shardingParam[0], shardingParam[1],childJobid,child_json);
         }
 
     }
@@ -110,7 +112,7 @@ public class XxlJobTrigger {
      */
     private static void processTrigger(XxlJobGroup group, XxlJobInfo jobInfo,
                                        int finalFailRetryCount, TriggerTypeEnum triggerType, int index, int total
-    ,String childJobid){
+    ,String childJobid,List<Map> child_json){
 
         // param
         ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.match(jobInfo.getExecutorBlockStrategy(), ExecutorBlockStrategyEnum.SERIAL_EXECUTION);  // block strategy
@@ -123,6 +125,7 @@ public class XxlJobTrigger {
         jobLog.setJobId(jobInfo.getId());
         jobLog.setTriggerTime(new Date());
         jobLog.setChildJobid(childJobid);
+        jobLog.setChildJson(child_json!=null?child_json.toString():null);
         XxlJobAdminConfig.getAdminConfig().getXxlJobLogDao().save(jobLog);
         logger.debug(">>>>>>>>>>> xxl-job trigger start, jobId:{}", jobLog.getId());
 

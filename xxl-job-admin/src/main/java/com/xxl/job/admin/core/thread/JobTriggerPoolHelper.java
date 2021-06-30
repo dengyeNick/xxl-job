@@ -6,6 +6,8 @@ import com.xxl.job.admin.core.trigger.XxlJobTrigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -74,7 +76,7 @@ public class JobTriggerPoolHelper {
                            final int failRetryCount,
                            final String executorShardingParam,
                            final String executorParam,
-                           final String addressList,String childJobid) {
+                           final String addressList,String childJobid,List<Map> child_json) {
 
         // choose thread pool
         ThreadPoolExecutor triggerPool_ = fastTriggerPool;
@@ -92,7 +94,7 @@ public class JobTriggerPoolHelper {
 
                 try {
                     // do trigger
-                    XxlJobTrigger.trigger(jobId, triggerType, failRetryCount, executorShardingParam, executorParam, addressList,childJobid);
+                    XxlJobTrigger.trigger(jobId, triggerType, failRetryCount, executorShardingParam, executorParam, addressList,childJobid,child_json);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 } finally {
@@ -145,12 +147,12 @@ public class JobTriggerPoolHelper {
      */
     public static void trigger(int jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorShardingParam,
                                String executorParam, String addressList) {
-        helper.addTrigger(jobId, triggerType, failRetryCount, executorShardingParam, executorParam, addressList,null);
+        helper.addTrigger(jobId, triggerType, failRetryCount, executorShardingParam, executorParam, addressList,null,null);
     }
 
     public static void triggerTwo(int jobId, TriggerTypeEnum triggerType, int failRetryCount, String executorShardingParam,
-                               String executorParam, String addressList,String childJobid) {
-        helper.addTrigger(jobId, triggerType, failRetryCount, executorShardingParam, executorParam, addressList,childJobid);
+                                  String executorParam, String addressList, String childJobid, List<Map> child_json) {
+        helper.addTrigger(jobId, triggerType, failRetryCount, executorShardingParam, executorParam, addressList,childJobid,child_json);
     }
 
 }

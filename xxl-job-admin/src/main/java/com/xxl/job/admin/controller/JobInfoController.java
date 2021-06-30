@@ -1,5 +1,6 @@
 package com.xxl.job.admin.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.xxl.job.admin.core.complete.XxlJobCompleter;
 import com.xxl.job.admin.core.cron.CronExpression;
 import com.xxl.job.admin.core.exception.XxlJobException;
@@ -141,7 +142,7 @@ public class JobInfoController {
 	@RequestMapping("/trigger")
 	@ResponseBody
 	//@PermissionLimit(limit = false)
-	public ReturnT<String> triggerJob(int id, String executorParam, String addressList,String child_jobids) {
+	public ReturnT<String> triggerJob(int id, String executorParam, String addressList,String child_jobids,String child_json) {
 		// force cover job param
 		if (executorParam == null) {
 			executorParam = "";
@@ -149,7 +150,8 @@ public class JobInfoController {
 
 //		String child_jobids="32,34";
 		if (child_jobids!=null && child_jobids.length()>0){
-			JobTriggerPoolHelper.triggerTwo(id, TriggerTypeEnum.MANUAL, -1, null, executorParam, addressList,child_jobids);
+			List<Map> list=(List<Map>) JSON.parse(child_json);
+			JobTriggerPoolHelper.triggerTwo(id, TriggerTypeEnum.MANUAL, -1, null, executorParam, addressList,child_jobids,list);
 		}else{
 			JobTriggerPoolHelper.trigger(id, TriggerTypeEnum.MANUAL, -1, null, executorParam, addressList);
 		}

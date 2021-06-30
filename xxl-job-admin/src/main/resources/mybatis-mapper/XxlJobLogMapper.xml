@@ -25,6 +25,7 @@
 
 		<result column="alarm_status" property="alarmStatus" />
 		<result column="child_jobid" property="childJobid" />
+		<result column="child_json" property="childJson" />
 	</resultMap>
 
 	<sql id="Base_Column_List">
@@ -43,7 +44,8 @@
 		t.handle_code,
 		t.handle_msg,
 		t.alarm_status,
-		t.child_jobid
+		t.child_jobid,
+		t.child_json
 	</sql>
 	
 	<select id="pageList" resultMap="XxlJobLog">
@@ -126,14 +128,16 @@
 			`trigger_time`,
 			`trigger_code`,
 			`handle_code`,
-			`child_jobid`
+			`child_jobid`,
+			`child_json`
 		) VALUES (
 			#{jobGroup},
 			#{jobId},
 			#{triggerTime},
 			#{triggerCode},
 			#{handleCode},
-			#{childJobid}
+			#{childJobid},
+			#{childJson}
 		);
 		<!--<selectKey resultType="java.lang.Integer" order="AFTER" keyProperty="id">
 			SELECT LAST_INSERT_ID() 
