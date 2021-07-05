@@ -150,6 +150,10 @@ public class JobLogController {
                 }
             }
 
+            //执行日志与调度信息合并
+            XxlJobLog xxlJobLog=xxlJobLogDao.load(logId);
+            logResult.getContent().setLogContent(xxlJobLog.getTriggerMsg()+"<br>"+logResult.getContent().getLogContent());
+
 			return logResult;
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
