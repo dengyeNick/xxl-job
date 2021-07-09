@@ -120,6 +120,12 @@
 		WHERE t.id = #{id}
 	</select>
 
+	<select id="getLogByJobId" parameterType="java.lang.Long" resultMap="XxlJobLog">
+		SELECT <include refid="Base_Column_List" />
+		FROM xxl_job_log AS t
+		WHERE t.job_id = #{job_id} order by t.trigger_time asc
+	</select>
+
 	
 	<insert id="save" parameterType="com.xxl.job.admin.core.model.XxlJobLog" useGeneratedKeys="true" keyProperty="id" >
 		INSERT INTO xxl_job_log (

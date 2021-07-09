@@ -26,10 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * index controller
@@ -134,6 +131,43 @@ public class JobLogController {
         model.addAttribute("logId", jobLog.getId());
 		return "joblog/joblog.detail";
 	}
+
+	@RequestMapping("/getLogByJobId")
+	@ResponseBody
+	public List<ReturnT<LogResult>> logDetailPage(int id){
+		List<ReturnT<LogResult>> returnTList=new ArrayList<>();
+		List<XxlJobLog> list=xxlJobLogDao.getLogByJobId(id);
+		for (XxlJobLog log:list){
+			ReturnT<LogResult> res=getLogResult(log.getExecutorAddress(),log.getTriggerTime().getTime(),log.getId(),1,log);
+			returnTList.add(res);
+		}
+		return returnTList;
+	}
+
+	public ReturnT<LogResult> getLogResult(String executorAddress, long triggerTime, long logId, int fromLineNum,XxlJobLog xxlJobLog) {
+		try {
+			ExecutorBiz executorBiz = XxlJobScheduler.getExecutorBiz(executorAddress);
+			ReturnT<LogResult> logResult = executorBiz.log(new LogParam(triggerTime, logId, fromLineNum));
+
+			// is end
+			if (logResult.getContent() != null && logResult.getContent().getFromLineNum() > logResult.getContent().getToLineNum()) {
+				XxlJobLog jobLog = xxlJobLogDao.load(logId);
+				if (jobLog.getHandleCode() > 0) {
+					logResult.getContent().setEnd(true);
+				}
+			}
+
+			//执行日志与调度信息合并
+			logResult.getContent().setLogContent(xxlJobLog.getTriggerMsg() + "<br>" + logResult.getContent().getLogContent());
+
+			return logResult;
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			return new ReturnT<LogResult>(ReturnT.FAIL_CODE, e.getMessage());
+		}
+	}
+
+
 
 	@RequestMapping("/logDetailCat")
 	@ResponseBody

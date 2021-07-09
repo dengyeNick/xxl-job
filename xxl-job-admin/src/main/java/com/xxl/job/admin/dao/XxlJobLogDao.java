@@ -59,4 +59,5 @@ public interface XxlJobLogDao {
 
 	public List<Long> findLostJobIds(@Param("losedTime") Date losedTime);
 
+	List<XxlJobLog> getLogByJobId(@Param("job_id") long job_id);
 }
